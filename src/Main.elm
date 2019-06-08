@@ -318,12 +318,12 @@ kateraKanta model kdaj tomorrow =
         Just foo ->
             div [ class "container mt-8 mx-auto text-center" ]
                 [ h2 [ class "text-2xl mb-8" ] [ text (kdaj ++ " pobirajo:") ]
-                , div [ class "border border-black p-2" ]
+                , div []
                     [ div [ class "flex text-2xl border-b mb-2 border-black " ]
                         [ div [ class "w-1/3" ] [ text "Odpadki" ]
                         , div [ class "w-2/3" ] [ text "Kanta" ]
                         ]
-                    , div [] <|
+                    , div [ class "container" ] <|
                         List.map kantaToHtml foo.kanta
                     ]
                 ]
