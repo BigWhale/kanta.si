@@ -15,7 +15,7 @@ Last time the whole street had cans out on the street for nothing.
 Imagine the time we wasted!
 -
 
-So, I wrote an application, now I don't have to worry about this stuff.
+So, I wrote an application and now I don't have to worry about this stuff.
 It was a really fun way to get more into Elm.
 
 How to?
