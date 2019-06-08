@@ -1,0 +1,15 @@
+{
+  "name": "kanta",
+  "version": "1.0.0",
+  "description": "Katero kanto bomo nastavili?",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-2.0",
+  "devDependencies": {
+    "postcss-import": "^12.0.1",
+    "tailwindcss": "^1.0.3"
+  }
+}

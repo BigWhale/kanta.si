@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+elm-stuff/
+package-lock.json
+js/
+css/style.css
+
