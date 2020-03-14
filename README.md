@@ -36,5 +36,10 @@ calendar entries in the `Main.elm`. It's clumsy, I know.
 
 Bugs
 -
-Some.  
+Currently everything is broken, since I'm in the process of a complete rewrite.
+There's a backend server written in Golang and this little application is in
+the process of being rewritten. I'll use [elm-spa](https://github.com/ryannhg/elm-spa)
+for front-end, but I have to get rid of all the element-ui stuff. It just feels wrong. 
+
+OMG, HE BROKE THE BUILD!
 
