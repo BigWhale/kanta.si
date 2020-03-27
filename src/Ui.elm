@@ -1,223 +1,234 @@
 module Ui exposing (..)
 
-import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
-import Element.Input as Input
-import Html.Attributes as Attr
+import Html exposing (..)
+import Html.Attributes exposing (class, href, id)
+import Html.Events exposing (onClick)
 import Time
-import Utils.Api exposing (Pickup, TrashType)
+import Utils.Api exposing (Location, Pickup, TrashType)
 import Utils.Formatting exposing (..)
 
 
 
--- Color definitions
+-- BUTTONS
 
 
-colors :
-    { primary : Element.Color
-    , secondary : Element.Color
-    , white : Element.Color
-    , black : Element.Color
-    }
-colors =
-    { primary = rgb255 45 136 45
-    , secondary = rgb255 170 57 57
-    , white = rgb255 255 255 255
-    , black = rgb255 0 0 0
-    }
+type ButtonType
+    = Edit Int
+    | Cancel Int
+    | Delete Int
+    | Save Int
 
 
-
--- Transition helper
-
-
-transition : Int -> List String -> Attribute msg
-transition duration properties =
-    Element.htmlAttribute <|
-        Attr.style
-            "transition"
-            (properties
-                |> List.map (\prop -> prop ++ " " ++ String.fromInt duration ++ "ms ease-in-out")
-                |> String.join ", "
-            )
+type InputType
+    = Street Int
+    | StreetNo Int
+    | City Int
 
 
+getButtonId : ButtonType -> Int
+getButtonId btype =
+    case btype of
+        Edit val ->
+            val
 
--- Generic example
+        Cancel val ->
+            val
+
+        Delete val ->
+            val
+
+        Save val ->
+            val
 
 
-hero : { title : String } -> Element msg
-hero options =
-    column
-        [ centerX
-        , paddingXY 16 75
-        , spacing 24
+buttonDebugString : ButtonType -> String
+buttonDebugString btype =
+    case btype of
+        Edit val ->
+            "Edit: " ++ String.fromInt val
+
+        Cancel val ->
+            "Cancel: " ++ String.fromInt val
+
+        Delete val ->
+            "Delete: " ++ String.fromInt val
+
+        Save val ->
+            "Save: " ++ String.fromInt val
+
+
+inputDebugString : InputType -> String
+inputDebugString itype =
+    case itype of
+        Street id ->
+            "Street " ++ String.fromInt id
+
+        StreetNo id ->
+            "StreetNo " ++ String.fromInt id
+
+        City id ->
+            "City " ++ String.fromInt id
+
+
+type ButtonSize
+    = XL
+    | L
+    | M
+    | S
+    | XS
+
+
+buttonSize : ButtonSize -> String
+buttonSize s =
+    case s of
+        XL ->
+            "px-6 py-3 leading-6"
+
+        L ->
+            "px-4 py-2 leading-6"
+
+        M ->
+            "px-4 py-2 leading-5"
+
+        S ->
+            "px-3 py-2 leading-4"
+
+        XS ->
+            "px-2.5 py-1.5 leading-4"
+
+
+titleView : String -> String -> Html msg
+titleView title classes =
+    h1
+        [ class "text-3xl"
+        , class classes
         ]
-        [ column [ spacing 14 ]
-            [ el [ centerX, Font.size 48, Font.semiBold ] (text options.title)
-            ]
-        ]
+        [ text title ]
 
 
-titleView : String -> Element msg
-titleView title =
-    el
-        [ paddingXY 48 24
-        , Font.size 48
-        ]
-        (text title)
-
-
-dateTimeView : Time.Zone -> Time.Posix -> Element msg
+dateTimeView : Time.Zone -> Time.Posix -> Html msg
 dateTimeView zone time =
-    if Time.posixToMillis time > 0 then
-        row []
-            [ el
-                [ Font.size 36
-                ]
-                (text <| formatDate zone time)
-            ]
+    div [ class "text-xl" ]
+        [ if Time.posixToMillis time > 0 then
+            text <| formatDate zone time
 
-    else
-        row []
-            [ el [] (text "Preračunavam ...") ]
-
-
-linkButton : ( String, String ) -> Element msg
-linkButton ( label, url ) =
-    link
-        [ Background.color colors.white
-        , Border.color colors.primary
-        , Font.color colors.primary
-        , Border.rounded 6
-        , Border.width 2
-        , Font.size 16
-        , paddingXY 24 8
-        , mouseOver
-            [ Background.color colors.primary
-            , Font.color colors.white
-            ]
-        , transition 300 [ "color", "background-color" ]
+          else
+            text "Preračunavam ..."
         ]
-        { url = url, label = text label }
 
 
-clickButton : ( String, Maybe msg ) -> Element msg
-clickButton ( label, onpress ) =
-    Input.button
-        [ Background.color colors.white
-        , Border.color colors.primary
-        , Font.color colors.primary
-        , Border.rounded 6
-        , Border.width 2
-        , Font.size 16
-        , paddingXY 24 8
-        , mouseOver
-            [ Background.color colors.primary
-            , Font.color colors.white
+linkButton : String -> String -> Html msg
+linkButton label url =
+    span [ class "inline-flex rounded-mv shadow-sm" ]
+        [ a
+            [ class "inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4"
+            , class "font-medium rounded text-white bg-green-600 hover:bg-green-500 focus:outline-none"
+            , class "focus:border-green-700 focus:shadow-outline-green active:bg-green-700 transition"
+            , class "ease-in-out duration-150"
+            , href url
             ]
-        , transition 300 [ "color", "background-color" ]
+            [ text label ]
         ]
-        { onPress = onpress, label = text label }
 
 
-showPickup : Pickup -> Element msg
+clickButton : ButtonSize -> String -> msg -> Html msg
+clickButton size label toMsg =
+    span [ class "inline-flex rounded-mv shadow-sm" ]
+        [ button
+            [ class "inline-flex items-center border border-transparent text-xs font-medium rounded"
+            , class "text-white bg-green-600 hover:bg-green-500"
+            , class "focus:outline-none focus:border-green-700 focus:shadow-outline-green active:bg-green-700"
+            , class "transition ease-in-out duration-150"
+            , class (buttonSize size)
+            , onClick toMsg
+            ]
+            [ text label ]
+        ]
+
+
+clickButtonId : ButtonSize -> String -> ButtonType -> (ButtonType -> msg) -> Html msg
+clickButtonId size label butType toMsg =
+    span [ class "inline-flex rounded-mv shadow-sm text-center px-2" ]
+        [ button
+            [ id (String.fromInt (getButtonId butType))
+            , class "inline-flex items-center border border-transparent text-xs font-medium rounded"
+            , class "text-white bg-green-600 hover:bg-green-500 justify-center"
+            , class "focus:outline-none focus:border-green-700 focus:shadow-outline-green active:bg-green-700"
+            , class "transition ease-in-out duration-150 w-16"
+            , class (buttonSize size)
+            , onClick (toMsg butType)
+            ]
+            [ text label ]
+        ]
+
+
+showPickup : Pickup -> Html msg
 showPickup pickup =
     let
         header =
-            column [ paddingXY 50 16, width fill ]
-                [ row [ width fill, centerX ]
-                    [ el
-                        [ Font.center
-                        , width fill
-                        , paddingEach
-                            { top = 8
-                            , right = 24
-                            , bottom = 8
-                            , left = 16
-                            }
-                        , Border.color (rgb255 0 0 0)
-                        , Border.widthEach
-                            { top = 0
-                            , right = 0
-                            , bottom = 1
-                            , left = 0
-                            }
-                        ]
-                        (text "Odpadki")
-                    , el
-                        [ Font.center
-                        , width fill
-                        , paddingEach
-                            { top = 8
-                            , right = 16
-                            , bottom = 8
-                            , left = 24
-                            }
-                        , Border.color (rgb255 0 0 0)
-                        , Border.widthEach
-                            { top = 0
-                            , right = 0
-                            , bottom = 1
-                            , left = 0
-                            }
-                        ]
-                        (text "Kanta")
-                    ]
+            div [ class "flex justify-between border-b border-black mx-auto mb-4 text-2xl" ]
+                [ div [ class "w-1/2 text-2xl" ] [ text "Odpadki" ]
+                , div [ class "w-1/2 text-2xl " ] [ text "Kanta" ]
                 ]
 
-        trashRow : TrashType -> Element msg
+        trashRow : TrashType -> Html msg
         trashRow trash =
-            row [ paddingXY 0 8, width fill ]
-                [ el
-                    [ centerY
-                    , Font.center
-                    , width fill
-                    , Background.color (kantaToColor trash.color)
-                    , paddingEach
-                        { top = 8
-                        , right = 24
-                        , bottom = 8
-                        , left = 16
-                        }
+            div [ class "flex justify-between align-center mx-auto mb-4" ]
+                [ div
+                    [ class "w-1/2 px-8 py-4 text-xl md:text-3xl font-bold flex items-center justify-center"
+                    , class (kantaToClassBg trash.color)
                     ]
-                    (text trash.type_)
-                , el
-                    [ Font.center
-                    , width fill
-                    , Font.color (kantaToColor trash.color)
-                    , paddingEach
-                        { top = 8
-                        , right = 16
-                        , bottom = 8
-                        , left = 24
-                        }
+                    [ text trash.type_ ]
+                , div
+                    [ class "w-1/2 px-8 py-4 text-xl md:text-3xl font-bold flex items-center justify-center"
+                    , class (kantaToClassCol trash.color)
                     ]
-                    (text (kantaToString trash.color))
+                    [ text (kantaToString trash.color) ]
                 ]
 
         trashTable =
-            column [ width fill, paddingXY 50 8 ] <|
+            div [] <|
                 List.map trashRow pickup.trash
     in
-    column
-        [ Font.size 42
-        , width fill
-        , centerX
-        ]
+    div []
         [ header
         , trashTable
         ]
 
 
-showNextPickup : Time.Zone -> Pickup -> Element msg
+showNextPickup : Time.Zone -> Pickup -> Html msg
 showNextPickup zone pickup =
-    column
-        [ width fill
-        , centerX
-        ]
-        [ row [ centerX ] [ dateTimeView zone pickup.date ]
+    div [ class "mt-12" ]
+        [ div [ class "mb-12" ] [ dateTimeView zone pickup.date ]
         , showPickup pickup
         ]
+
+
+
+-- EDIT HELPERS
+
+
+updateLocationRecord : Int -> String -> InputType -> List Location -> List Location
+updateLocationRecord id value intype locations =
+    let
+        replaceData item =
+            if item.id == id then
+                case intype of
+                    Street v ->
+                        { item | street = value }
+
+                    StreetNo v ->
+                        { item | street_no = value }
+
+                    City v ->
+                        { item | city = value }
+
+            else
+                item
+    in
+    List.map replaceData locations
+
+
+deleteLocationRecord : Int -> List Location -> List Location
+deleteLocationRecord id list =
+    List.filter (\i -> i.id /= id) list

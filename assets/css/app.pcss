@@ -1,0 +1,20 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+/* you can include CSS here */
+html, body {
+    font-family: Ubuntu, sans-serif;
+}
+
+.table-data {
+    & tr:nth-child(odd) {
+        @apply bg-white;
+    }
+
+    & tr:nth-child(even) {
+        @apply bg-gray-50;
+    }
+
+}

@@ -1,7 +1,8 @@
 module Pages.About exposing (Model, Msg, page)
 
-import Element exposing (..)
 import Generated.Params as Params
+import Html exposing (..)
+import Html.Attributes exposing (class)
 import Spa.Page
 import Ui exposing (..)
 import Utils.Spa exposing (Page)
@@ -27,7 +28,11 @@ page =
 -- VIEW
 
 
-view : Element Msg
+view : Html Msg
 view =
-    column [ centerX ]
-        [ titleView "O Kanti" ]
+    div [ class "bg-white overflow-hidden shadow rounded-lg" ]
+        [ div [ class "px-4 py-5 sm:p-6 text-center" ]
+            [ titleView "Kanta.Si" ""
+            , p [] [ text "Za tiste dni ... ... ko pozabiš katero kanto pobirajo." ]
+            ]
+        ]

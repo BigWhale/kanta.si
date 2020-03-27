@@ -1,6 +1,5 @@
 module Utils.Formatting exposing (..)
 
-import Element as Element exposing (..)
 import Time exposing (..)
 import Utils.Api exposing (..)
 
@@ -113,20 +112,39 @@ kantaToString kanta =
             "Rdeča"
 
 
-kantaToColor : Barva -> Element.Color
-kantaToColor kanta =
+kantaToClassBg : Barva -> String
+kantaToClassBg kanta =
     case kanta of
         Rumena ->
-            rgb255 240 240 0
+            "bg-rumena"
 
         Zelena ->
-            rgb255 45 136 45
+            "bg-zelena"
 
         Rdeca ->
-            rgb255 230 57 57
+            "bg-rdeca"
 
         Modra ->
-            rgb255 30 50 255
+            "bg-modra"
 
         Rjava ->
-            rgb255 125 80 10
+            "bg-rjava"
+
+
+kantaToClassCol : Barva -> String
+kantaToClassCol kanta =
+    case kanta of
+        Rumena ->
+            "text-rumena"
+
+        Zelena ->
+            "text-zelena"
+
+        Rdeca ->
+            "text-rdeca"
+
+        Modra ->
+            "text-modra"
+
+        Rjava ->
+            "text-rjava"

@@ -1,13 +1,13 @@
 module Pages.Top exposing (Model, Msg, page)
 
-import Element exposing (..)
-import Element.Font as Font
 import Generated.Params as Params
+import Html exposing (..)
+import Html.Attributes exposing (class)
 import Http
 import Spa.Page
 import Task
 import Time
-import Ui exposing (clickButton, dateTimeView, showNextPickup, showPickup, titleView)
+import Ui exposing (..)
 import Utils.Api exposing (Location, Pickup, TrashType, getLocation, getNext, getToday, getTomorrow, isActive)
 import Utils.Spa exposing (Page)
 
@@ -63,7 +63,7 @@ initialModel =
 page : Page Params.Top Model Msg model msg appMsg
 page =
     Spa.Page.element
-        { title = always "homepage"
+        { title = always "Kanta.Si"
         , init = always init
         , update = always update
         , view = always view
@@ -143,7 +143,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Time.every 1000 Tick
 
 
@@ -151,68 +151,36 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Element Msg
+view : Model -> Html Msg
 view model =
-    column [ centerX, width fill ]
-        [ row [ centerX ]
-            [ titleView "Katero kanto bomo danes?"
-            ]
-        , row
-            [ centerX
-            , paddingEach
-                { top = 0
-                , right = 0
-                , bottom = 48
-                , left = 0
-                }
-            ]
-            [ dateTimeView model.zone model.time
-            ]
-        , if isActive model.today then
-            showPickup model.today
+    main_ [ class "bg-white overflow-hidden shadow rounded-lg" ]
+        [ div [ class "px-4 py-5 sm:p-6 flex flex-col justify-center text-center" ]
+            [ titleView "Katero kanto bomo danes?" ""
+            , div [ class "mb-12" ] [ dateTimeView model.zone model.time ]
+            , if isActive model.today then
+                showPickup model.today
 
-          else
-            row [ centerX ]
-                [ el
-                    [ Font.center
-                    , Font.size 36
+              else
+                div [ class "text-2xl mb-12" ]
+                    [ text "Danes ne pobirajo smeti." ]
+            , titleView "Katero pa jutri?" "mt-12"
+            , if isActive model.tomorrow then
+                showPickup model.tomorrow
+
+              else
+                div [ class "text-2xl" ]
+                    [ text "Jutri ne pobirajo smeti." ]
+            , if not (isActive model.today) && not (isActive model.tomorrow) then
+                div [ class "my-12" ]
+                    [ clickButton M "Kdaj naj nastavim kanto?!" ButtonClick
+                    , if isActive model.next then
+                        div [ class "mt-8" ] [ showNextPickup model.zone model.next ]
+
+                      else
+                        div [] []
                     ]
-                    (text "Danes ne pobirajo smeti.")
-                ]
-        , row
-            [ centerX
-            , paddingEach
-                { top = 80
-                , right = 0
-                , bottom = 24
-                , left = 0
-                }
+
+              else
+                div [] []
             ]
-            [ titleView "Katero pa jutri?"
-            ]
-        , if isActive model.tomorrow then
-            showPickup model.tomorrow
-
-          else
-            row [ centerX ]
-                [ el
-                    [ Font.center
-                    , Font.size 36
-                    ]
-                    (text "Jutri ne pobirajo smeti.")
-                ]
-        , if not (isActive model.today) && not (isActive model.tomorrow) then
-            column [ width fill ]
-                [ row [ centerX, paddingXY 24 76 ]
-                    [ el [ centerX ] (clickButton ( "Kdaj naj nastavim kanto?!", Just ButtonClick ))
-                    ]
-                , if isActive model.next then
-                    showNextPickup model.zone model.next
-
-                  else
-                    none
-                ]
-
-          else
-            none
         ]

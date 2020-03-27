@@ -1,9 +1,9 @@
 module Pages.NotFound exposing (Model, Msg, page)
 
-import Element exposing (..)
-import Element.Font as Font
 import Generated.Params as Params
 import Generated.Routes as Routes exposing (routes)
+import Html exposing (..)
+import Html.Attributes as Attr
 import Spa.Page
 import Utils.Spa exposing (Page)
 
@@ -28,12 +28,15 @@ page =
 -- VIEW
 
 
-view : Element Msg
+view : Html Msg
 view =
-    column [ centerX, centerY, spacing 16 ]
-        [ el [ Font.size 32, Font.semiBold ] (text "404 is life.")
-        , link [ Font.size 16, Font.underline, centerX, Font.color (rgb255 204 75 75), mouseOver [ alpha 0.5 ] ]
-            { label = text "back home?"
-            , url = Routes.toPath routes.top
-            }
+    div [ Attr.class "page" ]
+        [ h1
+            [ Attr.class "page__title" ]
+            [ text "404 is life." ]
+        , a
+            [ Attr.class "page__link"
+            , Attr.href (Routes.toPath routes.top)
+            ]
+            [ text "back home?" ]
         ]

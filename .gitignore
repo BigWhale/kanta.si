@@ -2,5 +2,5 @@
 node_modules/
 elm-stuff/
 js/
-css/style.css
-
+public/css/style.css
+public/dist/elm.compiled.js

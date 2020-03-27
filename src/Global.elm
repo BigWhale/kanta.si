@@ -32,7 +32,7 @@ init : Commands msg -> Flags -> ( Model, Cmd Msg, Cmd msg )
 init _ _ =
     ( {}
     , Cmd.none
-    , Ports.log "Hello!"
+    , Ports.log "Starting up ..."
     )
 
 
