@@ -4,3 +4,4 @@ elm-stuff/
 js/
 public/css/style.css
 public/dist/elm.compiled.js
+/src/Generated/

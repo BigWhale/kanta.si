@@ -1,5 +1,6 @@
 module Ui exposing (..)
 
+import Generated.Route as Route exposing (Route, toHref)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, id)
 import Html.Events exposing (onClick)
@@ -232,3 +233,36 @@ updateLocationRecord id value intype locations =
 deleteLocationRecord : Int -> List Location -> List Location
 deleteLocationRecord id list =
     List.filter (\i -> i.id /= id) list
+
+deletePickupRecord : Int -> List Pickup -> List Pickup
+deletePickupRecord id list =
+    List.filter (\i -> i.id /= id) list
+
+-- Admin Sidebar
+
+
+sidebar : Route -> Html msg
+sidebar route =
+    div [ class "flex flex-col w-64 bg-gray-800" ]
+        [ div [ class "h-0 flex-1 flex flex-col pt-5 pb-4 overflow-y-auto" ]
+            [ div [ class "flex items-center flex-shrink-0 px-4" ]
+                []
+            , nav [ class "mt-5 flex-1 px-2 bg-gray-800" ]
+                [ a
+                    [ href (toHref Route.Admin_Top)
+                    , class "group flex items-center px-2 py-2 text-sm leading-5 font-medium text-gray-300 rounded-md hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150"
+                    ]
+                    [ text "Dashboard" ]
+                , a
+                    [ href (toHref (Route.Admin_Dynamic <| { param1 = "locations" }))
+                    , class "mt-1 group flex items-center px-2 py-2 text-sm leading-5 font-medium text-gray-300 rounded-md hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150"
+                    ]
+                    [ text "Locations" ]
+                , a
+                    [ href (toHref (Route.Admin_Dynamic <| { param1 = "pickups" }))
+                    , class "mt-1 group flex items-center px-2 py-2 text-sm leading-5 font-medium text-gray-300 rounded-md hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150"
+                    ]
+                    [ text "Pickups" ]
+                ]
+            ]
+        ]

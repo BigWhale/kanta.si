@@ -1,15 +1,13 @@
 module AdminUi exposing (..)
 
+import Generated.Route as Route exposing (Route, toHref)
 import Html exposing (..)
-import Html.Attributes exposing (class, type_, value)
+import Html.Attributes exposing (class, href, type_, value)
 import Html.Events exposing (onInput)
 import Ui exposing (..)
 import Utils.Api exposing (Location, Pickup, TrashType)
-
-
-
--- LOCATION EDIT
-
+import Utils.Formatting exposing (formatDate, trashtypesToString)
+import Time
 
 tableCell : String -> Bool -> Html msg
 tableCell txt edit =
@@ -49,6 +47,9 @@ tableInputCell txt edit inType toMsg =
                 [ text txt ]
         ]
 
+tableLocationCell : List Location -> Bool -> InputType -> (InputType -> String -> msg) -> Html msg
+tableLocationCell locations edit inType toMsg =
+    td [] [ text "Argle Bargle" ]
 
 tableHeaderCell : String -> Html msg
 tableHeaderCell label =
@@ -58,7 +59,7 @@ tableHeaderCell label =
         ]
         [ text label ]
 
-
+-- LOCATIONS
 locationTableView : List Location -> Int -> (InputType -> String -> msg) -> (ButtonType -> msg) -> Html msg
 locationTableView locations editId inputMsg buttonMsg =
     let
@@ -130,4 +131,77 @@ viewLocations locations editId inputMsg buttonMsg =
     div [ class "mt-2 text-center p-4" ]
         [ h1 [ class "text-2xl mb-4" ] [ text "Available locations" ]
         , locationTableView locations editId inputMsg buttonMsg
+        ]
+
+-- PICKUPS
+pickupTableView : List Pickup -> Int -> (InputType -> String -> msg) -> (ButtonType -> msg) -> Html msg
+pickupTableView pickups editId inputMsg buttonMsg =
+    let
+        header =
+            thead []
+                [ tr []
+                    [ tableHeaderCell "Id"
+                    , tableHeaderCell "Date"
+                    , tableHeaderCell "Locations"
+                    , tableHeaderCell "Trash"
+                    , tableHeaderCell "Edit"
+                    ]
+                ]
+
+        rows : Pickup -> Html msg
+        rows row =
+            let
+                rowEdit =
+                    if row.id == editId then
+                        True
+
+                    else
+                        False
+            in
+            tr []
+                [ tableCell (String.fromInt row.id) rowEdit
+                , tableInputCell (formatDate Time.utc row.date) rowEdit (Street row.id) inputMsg
+                , tableLocationCell row.locations rowEdit (StreetNo row.id) inputMsg
+                , tableInputCell (trashtypesToString row.trash) rowEdit (City row.id) inputMsg
+                , td
+                    [ class "px-4"
+                    , if rowEdit then
+                        class "bg-primary-50"
+
+                      else
+                        class ""
+                    ]
+                    [ if row.id == editId then
+                        span [ class "flex" ]
+                            [ clickButtonId XS "Cancel" (Cancel row.id) buttonMsg
+                            , clickButtonId XS "Save" (Save row.id) buttonMsg
+                            ]
+
+                      else
+                        span [ class "flex" ]
+                            [ clickButtonId XS "Edit" (Edit row.id) buttonMsg
+                            , clickButtonId XS "Delete" (Delete row.id) buttonMsg
+                            ]
+                    ]
+                ]
+    in
+    div [ class "flex flex-col" ]
+        [ div [ class "-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8" ]
+            [ div
+                [ class "align-middle inline-block min-w-full shadow overflow-hidden"
+                , class "sm:rounded-lg border-b border-gray-200"
+                ]
+                [ table [ class "min-w-full table-fixed" ]
+                    [ header
+                    , tbody [ class "table-data" ] <| List.map rows pickups
+                    ]
+                ]
+            ]
+        ]
+
+viewPickups : List Pickup -> Int -> (InputType -> String -> msg) -> (ButtonType -> msg) -> Html msg
+viewPickups pickups editId inputMsg buttonMsg =
+    div [ class "mt-2 text-center p-4" ]
+        [ h1 [ class "text-2xl mb-4" ] [ text "Current Pickups" ]
+        , pickupTableView pickups editId inputMsg buttonMsg
         ]

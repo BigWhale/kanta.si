@@ -1,23 +1,24 @@
-module Pages.Admin.Dynamic exposing (Model, Msg, page)
+module Pages.Admin.Dynamic exposing (Flags, Model, Msg, page)
 
 import AdminUi exposing (viewLocations)
-import Generated.Admin.Params as Params
 import Html exposing (..)
 import Http
-import Spa.Page
+import Page exposing (Document, Page)
 import Ui
 import Utils.Api as Api
-import Utils.Spa exposing (Page)
 
 
-page : Page Params.Dynamic Model Msg model msg appMsg
+type alias Flags =
+    { param1 : String }
+
+
+page : Page Flags Model Msg
 page =
-    Spa.Page.element
-        { title = always "Locations"
-        , init = always init
-        , update = always update
-        , subscriptions = always subscriptions
-        , view = always view
+    Page.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
         }
 
 
@@ -32,7 +33,7 @@ type alias Model =
     }
 
 
-init : Params.Dynamic -> ( Model, Cmd Msg )
+init : Flags -> ( Model, Cmd Msg )
 init { param1 } =
     ( { slug = param1
       , editId = 0
@@ -152,11 +153,15 @@ subscriptions _ =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    case model.slug of
-        "locations" ->
-            viewLocations model.locations model.editId ValueChanged ButtonClicked
+    { title = "Some title"
+    , body =
+        [ case model.slug of
+            "locations" ->
+                viewLocations model.locations model.editId ValueChanged ButtonClicked
 
-        _ ->
-            text ("Location " ++ model.slug ++ " isn't a valid location.")
+            _ ->
+                text ("Location " ++ model.slug ++ " isn't a valid location.")
+        ]
+    }

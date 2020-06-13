@@ -9,11 +9,7 @@
   </head>
   <body>
     <script src="/dist/elm.compiled.js"></script>
-    <script src="/ports.js"></script>
-    <script>
-      window.addEventListener('load', _ =>
-        window.ports.init(Elm.Main.init())
-      )
+    <script>Elm.Main.init();
     </script>
   </body>
 </html>

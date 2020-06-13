@@ -33,7 +33,7 @@ type alias TrashType =
 
 type alias Pickup =
     { id : Int
-    , location : Int
+    , locations : List Location
     , date : Time.Posix
     , trash : List TrashType
     }
@@ -75,7 +75,26 @@ deleteLocation id toMsg =
         , headers = []
         , url = "http://localhost:8080/location/" ++ String.fromInt id
         , body = Http.emptyBody
-        , expect = Http.expectJson toMsg deleteLocationDecoder
+        , expect = Http.expectJson toMsg deleteItemDecoder
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+getPickups : (Result Http.Error (List Pickup) -> msg) -> Cmd msg
+getPickups toMsg =
+    Http.get
+        { url = "http://localhost:8080/pickups/"
+        , expect = Http.expectJson toMsg pickupListDecoder
+        }
+
+deletePickup : Int -> (Result Http.Error Int -> msg) -> Cmd msg
+deletePickup id toMsg =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = "http://localhost:8080/pickup/" ++ String.fromInt id
+        , body = Http.emptyBody
+        , expect = Http.expectJson toMsg deleteItemDecoder
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -138,11 +157,6 @@ locationListDecoder =
     Decode.list locationDecoder
 
 
-deleteLocationDecoder : Decode.Decoder Int
-deleteLocationDecoder =
-    Decode.field "id" Decode.int
-
-
 trashDecoder : Decode.Decoder TrashType
 trashDecoder =
     Decode.succeed TrashType
@@ -173,7 +187,7 @@ kantaDecoder =
                         Decode.succeed Modra
 
                     _ ->
-                        Decode.fail <| "Uknown kanta color."
+                        Decode.fail <| "Unknown kanta color."
             )
 
 
@@ -181,10 +195,19 @@ pickupDecoder : Decode.Decoder Pickup
 pickupDecoder =
     Decode.succeed Pickup
         |> required "id" Decode.int
-        |> required "location" Decode.int
+        |> required "locations" (Decode.list locationDecoder)
         |> required "date" datetime
         |> required "trash" (Decode.list trashDecoder)
 
+pickupListDecoder : Decode.Decoder (List Pickup)
+pickupListDecoder =
+    Decode.list pickupDecoder
+
+-- GENERIC DECODERS
+
+deleteItemDecoder : Decode.Decoder Int
+deleteItemDecoder =
+    Decode.field "id" Decode.int
 
 
 -- HELPERS

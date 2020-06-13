@@ -148,3 +148,8 @@ kantaToClassCol kanta =
 
         Rjava ->
             "text-rjava"
+
+trashtypesToString : List TrashType -> String
+trashtypesToString trash =
+    String.concat (List.map (\x -> kantaToString x.color ) trash)
+

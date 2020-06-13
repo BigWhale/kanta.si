@@ -1,19 +1,21 @@
-module Pages.Top exposing (Model, Msg, page)
+module Pages.Top exposing (Flags, Model, Msg, page)
 
-import Generated.Params as Params
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Http
-import Spa.Page
+import Page exposing (Document, Page)
 import Task
 import Time
 import Ui exposing (..)
 import Utils.Api exposing (Location, Pickup, TrashType, getLocation, getNext, getToday, getTomorrow, isActive)
-import Utils.Spa exposing (Page)
 
 
 
 -- MODEL
+
+
+type alias Flags =
+    ()
 
 
 type alias Model =
@@ -39,19 +41,19 @@ initialModel =
     , zone = Time.utc
     , today =
         { id = 0
-        , location = 0
+        , locations = []
         , date = Time.millisToPosix 0
         , trash = []
         }
     , tomorrow =
         { id = 0
-        , location = 0
+        , locations = []
         , date = Time.millisToPosix 0
         , trash = []
         }
     , next =
         { id = 0
-        , location = 0
+        , locations = []
         , date = Time.millisToPosix 0
         , trash = []
         }
@@ -60,14 +62,13 @@ initialModel =
     }
 
 
-page : Page Params.Top Model Msg model msg appMsg
+page : Page Flags Model Msg
 page =
-    Spa.Page.element
-        { title = always "Kanta.Si"
-        , init = always init
-        , update = always update
-        , view = always view
-        , subscriptions = always subscriptions
+    Page.element
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = subscriptions
         }
 
 
@@ -75,7 +76,7 @@ page =
 -- INIT
 
 
-init : Params.Top -> ( Model, Cmd Msg )
+init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( initialModel
     , Cmd.batch
@@ -151,36 +152,40 @@ subscriptions _ =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    main_ [ class "bg-white overflow-hidden shadow rounded-lg" ]
-        [ div [ class "px-4 py-5 sm:p-6 flex flex-col justify-center text-center" ]
-            [ titleView "Katero kanto bomo danes?" ""
-            , div [ class "mb-12" ] [ dateTimeView model.zone model.time ]
-            , if isActive model.today then
-                showPickup model.today
+    { title = "Kanta.Si"
+    , body =
+        [ main_ [ class "bg-white overflow-hidden shadow rounded-lg" ]
+            [ div [ class "px-4 py-5 sm:p-6 flex flex-col justify-center text-center" ]
+                [ titleView "Katero kanto bomo danes?" ""
+                , div [ class "mb-12" ] [ dateTimeView model.zone model.time ]
+                , if isActive model.today then
+                    showPickup model.today
 
-              else
-                div [ class "text-2xl mb-12" ]
-                    [ text "Danes ne pobirajo smeti." ]
-            , titleView "Katero pa jutri?" "mt-12"
-            , if isActive model.tomorrow then
-                showPickup model.tomorrow
+                  else
+                    div [ class "text-2xl mb-12" ]
+                        [ text "Danes ne pobirajo smeti." ]
+                , titleView "Katero pa jutri?" "mt-12"
+                , if isActive model.tomorrow then
+                    showPickup model.tomorrow
 
-              else
-                div [ class "text-2xl" ]
-                    [ text "Jutri ne pobirajo smeti." ]
-            , if not (isActive model.today) && not (isActive model.tomorrow) then
-                div [ class "my-12" ]
-                    [ clickButton M "Kdaj naj nastavim kanto?!" ButtonClick
-                    , if isActive model.next then
-                        div [ class "mt-8" ] [ showNextPickup model.zone model.next ]
+                  else
+                    div [ class "text-2xl" ]
+                        [ text "Jutri ne pobirajo smeti." ]
+                , if not (isActive model.today) && not (isActive model.tomorrow) then
+                    div [ class "my-12" ]
+                        [ clickButton M "Kdaj naj nastavim kanto?!" ButtonClick
+                        , if isActive model.next then
+                            div [ class "mt-8" ] [ showNextPickup model.zone model.next ]
 
-                      else
-                        div [] []
-                    ]
+                          else
+                            div [] []
+                        ]
 
-              else
-                div [] []
+                  else
+                    div [] []
+                ]
             ]
         ]
+    }
